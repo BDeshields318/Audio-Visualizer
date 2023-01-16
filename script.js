@@ -1,5 +1,6 @@
 var song;
 var fft;
+var particles = [];
 
 function preload() {
   song = loadSound("Endors Toi.mp3");
@@ -7,28 +8,62 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  angleMode(DEGREES);
   fft = new p5.FFT();
 }
 
 function draw() {
   background(0);
   stroke(255);
+  noFill();
+
+  translate(width / 2, height / 2);
 
   var wave = fft.waveform();
 
-  for (var i = 0; i < width; i++) {
-    var index = floor(map(i, 0, width, 0, wave.length));
+  // for (var t = -1; t <= 1; t += 2) {
+  //   beginShape();
+  //   for (var i = 0; i <= 180; i++) {
+  //     var index = floor(map(i, 0, 180, 0, wave.length - 1));
 
-    var x = i;
-    var y = wave[index] * 300 + height / 2;
-    point(x, y);
+  //     var r = map(wave[index], -1, 1, 150, 350);
+
+  //     var x = r * sin(i) * t;
+  //     var y = r * cos(i);
+  //     vertex(x, y);
+  //   }
+  //   endShape();
+  // }
+
+  var p = new Particle();
+  particles.push(p);
+
+  for (var i = 0; i < particles.length; i++) {
+    particles[i].show();
   }
 }
 
 function mouseClicked() {
   if (song.isPlaying()) {
     song.pause();
+    noLoop();
   } else {
     song.play();
+    loop();
+  }
+}
+
+class Particle {
+  constructor() {
+    this.pos = p5.Vector.random2D().mult(250);
+    this.vel = createVector(0, 0);
+    this.acc = this.pos.copy().mult(random(0.0001, 0.00001));
+
+    this.w = random(3, 5);
+  }
+  show() {
+    noStroke();
+    fill(255);
+    ellipse(this.pos.x, this.pos.y, this.w);
   }
 }
